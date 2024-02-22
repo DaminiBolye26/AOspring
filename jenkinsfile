@@ -1,20 +1,32 @@
 pipeline {
-  agent any
+    agent any
+    
     stages {
-      stage('Build') {
-        steps {
-          echo 'Building the project...'
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/DaminiBolye26/sample_maven.git'
+            }
         }
-      }
-      stage('Test') {
-        steps {
-          echo 'Running tests...'
+        
+        stage('Build') {
+            steps {
+                sh 'javac App.java' 
+            }
         }
-      }
-      stage('Deploy') {
-        steps {
-          echo 'Deploying to production...'
+        
+        stage('Test') {
+            steps {
+                sh 'java App'
+            }
         }
-      }
     }
-  }
+    
+    post {
+        always {
+            junit '**/target/surefire-reports/*.xml' // Report test results
+        }
+        failure {
+            echo 'The build failed! Check logs for more details.'
+        }
+    }
+}
